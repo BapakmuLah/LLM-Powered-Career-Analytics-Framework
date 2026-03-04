@@ -12,6 +12,11 @@ KarirMind is a Large Language Model (LLM)–based ecosystem designed to help can
 
 ---
 
+## 📺 Live Demo
+
+**🔗 Frontend Demo (UI) : [Live Demo on Vercel](https://karirmind.vercel.app/main.html)** <br>
+**🔗 Backend Demo (API) : [Live Demo on Hugging Face Spaces](https://sandking-llm-career-analytics-framework.hf.space/docs)**
+
 ## 🚀 Overview
 
 This project is a modular AI career analytics platform consisting of four integrated systems:
