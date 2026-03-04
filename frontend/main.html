@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KarirMind | Elevate Your Future</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+            color: white;
+            min-height: 100vh;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1rem;
+        }
+        .gradient-text {
+            background: linear-gradient(to right, #60a5fa, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .loader {
+            border-top-color: #c084fc;
+            -webkit-animation: spinner 1.5s linear infinite;
+            animation: spinner 1.5s linear infinite;
+        }
+        @keyframes spinner {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <nav class="glass-panel mx-4 mt-4 px-6 py-4 flex justify-between items-center fixed top-0 left-0 right-0 z-50">
+        <div class="text-2xl font-bold tracking-tighter">
+            <a href="index.html"><i class="fa-solid fa-rocket text-blue-400 mr-2"></i>KarirMind <span class="gradient-text">AI</span></a>
+        </div>
+        <div class="hidden md:flex space-x-6 text-sm font-semibold text-gray-300">
+            <a href="#" class="hover:text-white transition">Dashboard</a>
+            <a href="#" class="hover:text-white transition">Pricing</a>
+            <a href="#" class="hover:text-white transition">About</a>
+        </div>
+    </nav>
+
+    <div class="pt-32 pb-20 px-4 max-w-6xl mx-auto">
+        
+        <div class="text-center mb-16">
+            <h1 class="text-5xl md:text-7xl font-bold mb-6">Master Your <span class="gradient-text">Career Path</span></h1>
+            <p class="text-lg text-gray-400 max-w-2xl mx-auto">Upload your CV and let our AI analyze it & assessing job fit, estimating potential salary, and recommending the portfolio projects that best match your career goals.</p>
+        </div>
+
+        <div class="flex flex-wrap justify-center gap-4 mb-12">
+            <button onclick="switchTab('critique')" id="btn-critique" class="tab-btn active px-6 py-3 rounded-full bg-blue-600 hover:bg-blue-500 font-semibold transition shadow-[0_0_15px_rgba(37,99,235,0.5)]">Resume Critique</button>
+            <button onclick="switchTab('job')" id="btn-job" class="tab-btn px-6 py-3 rounded-full glass-panel hover:bg-white/10 font-semibold transition">Job Prediction</button>
+            <button onclick="switchTab('salary')" id="btn-salary" class="tab-btn px-6 py-3 rounded-full glass-panel hover:bg-white/10 font-semibold transition">Salary Estimator</button>
+            <button onclick="switchTab('portfolio')" id="btn-portfolio" class="tab-btn px-6 py-3 rounded-full glass-panel hover:bg-white/10 font-semibold transition">Portfolio Builder</button>
+        </div>
+
+        <div class="glass-panel p-8 md:p-12 shadow-2xl relative overflow-hidden">
+            
+            <div id="upload-section" class="block">
+                <div class="border-2 border-dashed border-gray-500 rounded-xl p-12 text-center hover:border-purple-400 transition cursor-pointer" id="drop-zone">
+                    <i class="fa-solid fa-cloud-arrow-up text-5xl text-gray-400 mb-4" id="upload-icon"></i>
+                    <h3 class="text-xl font-semibold mb-2">Drag & Drop Your Resume</h3>
+                    <p class="text-gray-400 text-sm mb-6">Support .PDF, .DOCX, .TXT, .JPG, .PNG</p>
+                    <input type="file" id="file-input" class="hidden" accept=".pdf,.docx,.txt,.jpg,.jpeg,.png,.webp">
+                    <button onclick="document.getElementById('file-input').click()" class="bg-purple-600 hover:bg-purple-500 px-6 py-2 rounded-lg font-semibold transition">Browse Files</button>
+                    <p id="file-name" class="mt-4 text-green-400 font-semibold hidden"></p>
+                </div>
+            </div>
+
+            <div id="form-section" class="hidden max-w-2xl mx-auto">
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-300 mb-2">Target Role</label>
+                    <input type="text" id="target-role" placeholder="e.g. Senior AI Engineer" class="w-full bg-gray-800 border border-gray-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-purple-500" value="Senior AI Engineer">
+                </div>
+                <div class="mb-8">
+                    <label class="block text-sm font-medium text-gray-300 mb-2">Missing Skills</label>
+                    <input type="text" id="missing-skills" placeholder="e.g. Multi-Agent Systems, LangChain, Cloud Deployment" class="w-full bg-gray-800 border border-gray-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-purple-500" value="Multi-Agent Systems, LangChain, Cloud Deployment">
+                </div>
+            </div>
+
+            <div class="text-center mt-8">
+                <button id="analyze-btn" onclick="runAnalysis()" class="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 px-8 py-4 rounded-xl font-bold text-lg shadow-lg w-full md:w-auto transition transform hover:scale-105">
+                    <i class="fa-solid fa-bolt mr-2"></i> Analyze with AI
+                </button>
+            </div>
+
+            <div id="loading" class="hidden flex flex-col items-center justify-center mt-8">
+                <!--<div class="loader border-4 border-gray-600 rounded-full w-12 h-12 mb-4"></div>-->
+                <p class="text-gray-400 animate-pulse">Our AI is analyzing your data… Please wait..</p>
+            </div>
+
+            <div id="results-area" class="mt-12 hidden">
+                <h3 class="text-2xl font-bold mb-6 border-b border-gray-600 pb-2">Analysis Result</h3>
+                <div id="results-content" class="space-y-4"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = "https://sandking-indonesian-job-salary-predictor.hf.space";
+        let currentTab = 'critique';
+        let selectedFile = null;
+
+        // Endpoint Mapping
+        const endpoints = {
+            'critique': '/critique-resume',
+            'job': '/cv-job-prediction',
+            'salary': '/salary-estimation',
+            'portfolio': '/recommend-portfolio'
+        };
+
+        // File Input Handling
+        document.getElementById('file-input').addEventListener('change', function(e) {
+            if (e.target.files.length > 0) {
+                selectedFile = e.target.files[0];
+                const fileNameEl = document.getElementById('file-name');
+                fileNameEl.textContent = `File terpilih: ${selectedFile.name}`;
+                fileNameEl.classList.remove('hidden');
+                document.getElementById('upload-icon').classList.replace('text-gray-400', 'text-green-400');
+            }
+        });
+
+        // Tab Switching Logic
+        function switchTab(tab) {
+            currentTab = tab;
+            
+            // UI Button Updates
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.className = "tab-btn px-6 py-3 rounded-full glass-panel hover:bg-white/10 font-semibold transition";
+            });
+            const activeBtn = document.getElementById(`btn-${tab}`);
+            activeBtn.className = "tab-btn active px-6 py-3 rounded-full bg-blue-600 font-semibold transition shadow-[0_0_15px_rgba(37,99,235,0.5)]";
+
+            // Area Visibility Updates
+            if (tab === 'portfolio') {
+                document.getElementById('upload-section').classList.add('hidden');
+                document.getElementById('form-section').classList.remove('hidden');
+                document.getElementById('analyze-btn').innerHTML = '<i class="fa-solid fa-lightbulb mr-2"></i> Generate Projects';
+            } else {
+                document.getElementById('upload-section').classList.remove('hidden');
+                document.getElementById('form-section').classList.add('hidden');
+                document.getElementById('analyze-btn').innerHTML = '<i class="fa-solid fa-bolt mr-2"></i> Analyze Resume';
+            }
+
+            // Reset states
+            document.getElementById('results-area').classList.add('hidden');
+        }
+
+        // Main Fetch Function
+        async function runAnalysis() {
+            const resultArea = document.getElementById('results-area');
+            const resultContent = document.getElementById('results-content');
+            const loading = document.getElementById('loading');
+            
+            // Validation
+            if (currentTab !== 'portfolio' && !selectedFile) {
+                alert("Boss, tolong upload CV dulu ya sebelum di-analyze!");
+                return;
+            }
+
+            // Prepare UI for loading
+            resultArea.classList.add('hidden');
+            loading.classList.remove('hidden');
+            resultContent.innerHTML = '';
+
+            try {
+                let response;
+                
+                if (currentTab === 'portfolio') {
+                    // JSON Request for Portfolio
+                    const payload = {
+                        target_role: document.getElementById('target-role').value,
+                        missing_skills: document.getElementById('missing-skills').value
+                    };
+                    response = await fetch(`${API_BASE}${endpoints[currentTab]}`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                } else {
+                    // Multipart Form Request for Uploads
+                    const formData = new FormData();
+                    formData.append('file', selectedFile);
+                    response = await fetch(`${API_BASE}${endpoints[currentTab]}`, {
+                        method: 'POST',
+                        body: formData
+                    });
+                }
+
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                const data = await response.json();
+                
+                // Render Output based on feature
+                renderResults(currentTab, data, resultContent);
+                
+                loading.classList.add('hidden');
+                resultArea.classList.remove('hidden');
+
+            } catch (error) {
+                loading.classList.add('hidden');
+                alert(`A connection error occurred. Please check that the FastAPI backend is running and CORS is configured correctly. ${error.message}`);
+            }
+        }
+
+        // Render Data Logic
+        function renderResults(tab, data, container) {
+            let html = '';
+
+            if (tab === 'critique') {
+                data.suggestions.forEach(item => {
+                    const color = item.severity === 'HIGH' ? 'bg-red-500/20 border-red-500 text-red-200' : 
+                                  item.severity === 'MEDIUM' ? 'bg-yellow-500/20 border-yellow-500 text-yellow-200' : 
+                                  'bg-green-500/20 border-green-500 text-green-200';
+                    html += `
+                        <div class="border-l-4 p-4 rounded bg-gray-800 ${color}">
+                            <span class="font-bold text-xs px-2 py-1 bg-gray-900 rounded mb-2 inline-block">${item.severity}</span>
+                            <p class="mt-1">${item.recommendation}</p>
+                        </div>`;
+                });
+            } 
+            else if (tab === 'job') {
+                data.jobs.forEach(item => {
+                    html += `
+                        <div class="bg-gray-800 p-6 rounded-lg mb-4">
+                            <div class="flex justify-between items-center mb-2">
+                                <h4 class="text-xl font-bold text-blue-400">${item.job_title}</h4>
+                                <span class="bg-blue-600 text-white px-3 py-1 rounded-full text-sm font-bold">${item.probability}% Match</span>
+                            </div>
+                            <div class="w-full bg-gray-700 rounded-full h-2 mb-4">
+                                <div class="bg-blue-500 h-2 rounded-full" style="width: ${item.probability}%"></div>
+                            </div>
+                            <p class="text-gray-300 text-sm mb-2"><i class="fa-solid fa-check text-green-400 mr-2"></i><strong>Reason:</strong> ${item.reason}</p>
+                            <p class="text-gray-300 text-sm"><i class="fa-solid fa-triangle-exclamation text-yellow-400 mr-2"></i><strong>Skill Gap:</strong> ${item.skill_gap}</p>
+                        </div>`;
+                });
+            }
+            else if (tab === 'salary') {
+                html += `
+                    <div class="bg-gradient-to-br from-gray-800 to-gray-900 border border-gray-700 p-8 rounded-xl text-center mb-6">
+                        <p class="text-gray-400 uppercase tracking-widest text-sm font-semibold mb-2">Estimated Market Value</p>
+                        <h2 class="text-4xl md:text-5xl font-extrabold text-green-400 mb-4">${data.estimated_salary_range} <span class="text-lg text-gray-500">/ year</span></h2>
+                        <span class="inline-block bg-purple-600/30 text-purple-300 px-4 py-1 rounded-full text-sm border border-purple-500/50 mb-6">Seniority: ${data.seniority_level}</span>
+                        <p class="text-gray-300 text-sm md:text-base italic bg-gray-800 p-4 rounded text-left border-l-4 border-blue-500">"${data.justification}"</p>
+                    </div>
+                    <h4 class="font-bold text-xl mb-3"><i class="fa-solid fa-handshake-angle text-blue-400 mr-2"></i>Negotiation Tactics</h4>
+                    <ul class="space-y-3">`;
+                data.negotiation_tips.forEach(tip => {
+                    html += `<li class="flex items-start"><i class="fa-solid fa-arrow-right text-purple-400 mt-1 mr-3"></i><span class="text-gray-300">${tip}</span></li>`;
+                });
+                html += `</ul>`;
+            }
+            else if (tab === 'portfolio') {
+                data.projects.forEach((proj, idx) => {
+                    html += `
+                        <div class="bg-gray-800 border border-gray-600 rounded-xl p-6 mb-6">
+                            <h4 class="text-2xl font-bold text-purple-400 mb-2">Project ${idx + 1}: ${proj.project_name}</h4>
+                            <p class="text-gray-300 mb-4">${proj.description}</p>
+                            <div class="mb-4">
+                                <span class="text-sm font-bold text-gray-400 uppercase">Tech Stack:</span>
+                                <div class="flex flex-wrap gap-2 mt-2">
+                                    ${proj.tech_stack.map(tech => `<span class="bg-gray-700 px-3 py-1 rounded text-xs text-blue-300 border border-gray-600">${tech}</span>`).join('')}
+                                </div>
+                            </div>
+                            <div class="bg-gray-900 rounded p-4 mb-4">
+                                <span class="text-sm font-bold text-gray-400 uppercase block mb-2">Action Plan:</span>
+                                <ul class="text-sm text-gray-300 space-y-2">
+                                    ${proj.steps.map((step, i) => `<li><strong>Step ${i+1} (${step.step_name}):</strong> ${step.action}</li>`).join('')}
+                                </ul>
+                            </div>
+                            <div class="bg-blue-900/30 border border-blue-800 p-4 rounded-lg">
+                                <span class="text-xs font-bold text-blue-400 uppercase block mb-1"><i class="fa-solid fa-file-lines mr-1"></i>Resume Bullet Point:</span>
+                                <p class="text-gray-200 italic">"${proj.cv_bullet_point}"</p>
+                            </div>
+                        </div>`;
+                });
+            }
+
+            container.innerHTML = html;
+        }
+    </script>
+</body>
+</html>
